@@ -47,7 +47,7 @@ def func_generate_record_id(inn: str, shift: int = 0, verbose=False) -> Optional
             print(f"Logic Error: {e}")
         return None
 
-def func_generate_sha_hash(input_data: str,  bit_length: int = 512, salt: str = "") -> str:
+def func_generate_sha(input_data: str,  bit_length: int = 512, salt: str = "") -> str:
     if input_data is None:
         return None
     # 1. Encode string to bytes
@@ -79,6 +79,6 @@ if __name__ == "__main__":
     
     assert record_id == expected_record_id, f"Expected {expected_record_id}, got {record_id}"
 
-    hashed_rec_id = func_generate_sha_hash(expected_record_id, salt='ALGAGROUP')
+    hashed_rec_id = func_generate_sha(expected_record_id, salt='ALGAGROUP')
     assert hashed_rec_id == "fc82bcf49c1630209a816c668240b4b363ace3bcc1f1f7675bcbe39ef07d1d87e6faf789c5155b424455863d1be9877c867db2a25465dadba3688420e7ab6bd3", f"Expected fc82bcf49c1630209a816c668240b4b363ace3bcc1f1f7675bcbe39ef07d1d87e6faf789c5155b424455863d1be9877c867db2a25465dadba3688420e7ab6bd3, got {hashed_rec_id}"
     print(f"SHA-512 Hash: {hashed_rec_id}")
