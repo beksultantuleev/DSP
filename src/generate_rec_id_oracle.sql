@@ -96,7 +96,7 @@ begin
   :REC_ID := func_dsp_dsml_generate_record_id(p_inn => '22110199500001'
                                               );
   :HASHED_REC_ID := func_dsml_dsp_sha_algorithm(p_data      => :REC_ID,
-                                                p_salt      => 'ALGAGROUP'
+                                                p_salt      => ''
                                                 );
 end;
 
