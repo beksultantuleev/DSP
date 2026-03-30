@@ -4,3 +4,5 @@ virt_env/
 *.pyo
 .env
 .vscode/
+raw_data/
+logs/

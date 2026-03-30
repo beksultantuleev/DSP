@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  dsp_uploader:
+    # Tells Compose to build the image using the Dockerfile in the current directory
+    build: 
+      context: .
+      args:
+        HTTP_PROXY: ${HTTP_PROXY}
+        HTTPS_PROXY: ${HTTPS_PROXY}
+      dockerfile: Dockerfile
+    
+    # Naming the container makes it easier to spot in logs
+    container_name: dsp_csv_uploader
+    
+    # Automatically pulls in your KAFKA_TOPIC and other variables
+    env_file:
+      - .env
+      
+    # This is the Bind Mount: maps the local raw_data folder to the container's raw_data folder
+    volumes:
+      - ./raw_data:/app/raw_data
+      
+    # Since this is a script meant to run and finish (triggered by cron), 
+    # we explicitly tell Docker NOT to restart it automatically when it stops.
+    restart: "no"
