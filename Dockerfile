@@ -24,4 +24,4 @@ COPY src /app/src
 RUN mkdir -p /app/raw_data
 
 # Tell Docker to run your script when the container starts
-CMD ["python", "src/upload_csv_to_DSP.py"]
+CMD ["python", "src/upload_csv_via_docker.py"]
