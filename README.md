@@ -9,7 +9,7 @@
 
 - **Генерация кастомного Record ID** Преобразует входную строку ID, содержащую информацию о поле, дате рождения и числовом суффиксе, в компактную, обфусцированную числовую строку. Уникальность гарантируется вычислением количества дней с базовой даты (1940-01-01) и использованием дополнительных смещений.
 
-- **Безопасное хеширование по стандарту SHA-512** Все данные перед хешированием дополнительно конкатенируются с фиксированной солью `"ALGAGROUP"`, что существенно повышает безопасность.
+- **Безопасное хеширование по стандарту SHA-512** Все данные перед хешированием дополнительно конкатенируются с фиксированной солью, что существенно повышает безопасность.
 
 - **Единая логика для Python и Oracle** Функции соответствуют друг другу по логике и особенностям обработки данных, позволяя использовать модуль в различных инфраструктурах без потери совместимости.
 
@@ -61,15 +61,15 @@ def func_generate_record_id(inn: str, shift: int = 0, verbose: bool = False) -> 
 #### 2. `func_generate_sha`
 
 ```python
-def func_generate_sha(input_data: str, bit_length: int = 512, salt: str = "ALGAGROUP") -> Optional[str]:
+def func_generate_sha(input_data: str, bit_length: int = 512, salt: str = "") -> Optional[str]:
 ```
 
-**Описание:** Выполняет SHA-512 хеширование входной строки с обязательной конкатенацией соли `"ALGAGROUP"`.
+**Описание:** Выполняет SHA-512 хеширование входной строки с обязательной конкатенацией соли.
 
 **Параметры:**
 - `input_data` (str): Данные для хеширования.
 - `bit_length` (int, опционально): Длина хеша, строго `512` бит.
-- `salt` (str, опционально): Соль, обязательно `"ALGAGROUP"`.
+- `salt` (str, опционально): Соль, обязательно (Информация будет передана отдельно).
 
 **Возвращает:** Шестнадцатеричный дайджест (hex) или `None`, если вход пуст.
 
@@ -122,7 +122,12 @@ FUNCTION func_dsml_dsp_sha_algorithm(
 ### Python
 
 ```python
-from your_module import func_generate_record_id, func_generate_sha
+import func_generate_record_id, func_generate_sha
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables from .env file
+
+
+SALT = os.getenv("SALT", "")
 
 inn = "22110199500001"  # 2 - Мужчина | 21101995 - дата | 00001 - суффикс
 
@@ -132,7 +137,7 @@ print(f"Generated Record ID: {record_id}")
 # Вывод: 4076401266
 
 # Хеширование Record ID
-hashed_rec_id = func_generate_sha(record_id, bit_length=512, salt='ALGAGROUP')
+hashed_rec_id = func_generate_sha(record_id, bit_length=512, salt=SALT)
 print(f"SHA-512 Hash: {hashed_rec_id}")
 # Пример вывода:
 # fc82bcf49c1630209a816c668240b4b363ace3bcc1f1f7675bcbe39ef07d1d87e6faf789c5155b424455863d1be9877c867db2a25465dadba3688420e7ab6bd3
@@ -144,16 +149,18 @@ print(f"SHA-512 Hash: {hashed_rec_id}")
 DECLARE
   v_rec_id VARCHAR2(100);
   v_hashed_rec_id VARCHAR2(4000);
+  v_salt VARCHAR2(100);
 BEGIN
   -- Генерация Record ID
   v_rec_id := func_dsp_dsml_generate_record_id(
       p_inn => '22110199500001'
   );
+  v_salt := ...
 
   -- Хеширование с солью
   v_hashed_rec_id := func_dsml_dsp_sha_algorithm(
       p_data => v_rec_id,
-      p_salt => 'ALGAGROUP'
+      p_salt => v_salt
   );
 
   -- Вывод результатов
@@ -169,6 +176,6 @@ END;
 
 - Входная дата рождения в ID должна быть **не ранее 1940-01-01**, иначе функции возвращают `None` / `NULL`.
 - Пол кодируется строго числом `1` (женщина) или `2` (мужчина), другие значения считаются ошибочными.
-- Хеширование **всегда** происходит с добавлением фиксированной соли `"ALGAGROUP"` перед данными для улучшения безопасности.
+- Хеширование **всегда** происходит с добавлением фиксированной соли (информация будет дана отдельно) перед данными для улучшения безопасности.
 - Обе реализации — Python и Oracle — обеспечивают идентичное поведение, позволяя использовать их в различных компонентах архитектуры без расхождений.
 ```
